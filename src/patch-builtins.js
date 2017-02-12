@@ -15,7 +15,7 @@ import * as mutation from './logical-mutation'
 import {ActiveElementAccessor, ShadowRootAccessor, patchAccessors} from './patch-accessors'
 import {getProperty} from './logical-properties'
 import {addEventListener, removeEventListener} from './patch-events'
-import {attachShadow} from './attach-shadow'
+import {attachShadow, ShadyRoot} from './attach-shadow'
 
 function getAssignedSlot(node) {
   mutation.renderRootNode(node);
@@ -55,7 +55,17 @@ let nodeMixin = {
   },
 
   get isConnected() {
-    return document.documentElement.contains(this)
+    // Fast path for distributed nodes.
+    const ownerDocument = this.ownerDocument;
+    if (ownerDocument && ownerDocument.contains && ownerDocument.contains(this)) return true;
+    const ownerDocumentElement = ownerDocument.documentElement;
+    if (ownerDocumentElement && ownerDocumentElement.contains && ownerDocumentElement.contains(this)) return true;
+
+    let node = this;
+    while (node && !(node instanceof Document)) {
+      node = node.parentNode || (node instanceof ShadyRoot ? node.host : undefined);
+    }
+    return !!(node && node instanceof Document);
   }
 
 };
@@ -133,7 +143,9 @@ let elementMixin = utils.extendAll({
 Object.defineProperties(elementMixin, ShadowRootAccessor);
 
 let documentMixin = utils.extendAll({
-
+  importNode(node, deep) {
+    return mutation.importNode(node, deep);
+  }
 }, fragmentMixin);
 
 Object.defineProperties(documentMixin, {
@@ -171,13 +183,6 @@ export function patchBuiltins() {
   patchBuiltin(window.DocumentFragment.prototype, fragmentMixin);
   patchBuiltin(window.Element.prototype, elementMixin);
   patchBuiltin(window.Document.prototype, documentMixin);
-  // patch this only on the instance because (1) main document is only
-  // one we care about; (2) better compatibility with other polyfills
-  // that may also patch the instance (e.g. CE)
-  let previousImportNode = document.importNode;
-  document.importNode = function(node, deep) {
-    return mutation.importNode(node, deep, previousImportNode);
-  }
   if (window.HTMLSlotElement) {
     patchBuiltin(window.HTMLSlotElement.prototype, slotMixin);
   }
