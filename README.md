@@ -26,6 +26,7 @@ shadydom is maintained by the Polymer team. They've done fantastic work creating
 * If you submit a good PR that gets merged, you'll be added a contributor and have push access like anyone else.
 * Answer issues in some way. No one is obligated to fix issues, of course, but we'll at least let you know that a PR is welcome!
 * Fix the test infrastructure and set up CI so that the project can be maintained with confidence.
+* Regularly pull from webcomponents/shadydom#master so that any bug fixes that happen there are fixed in cloudydom as well.
 
 ## Usage
 
