@@ -2,6 +2,14 @@
 
 cloudydom is a shim for ShadowDOM. It is a fork of webcomponents/shadydom, with some bug fixes not present in that project.
 
+## Install
+
+Yarn:
+
+```shell
+yarn add cloudydom
+```
+
 ## Why fork
 
 shadydom is maintained by the Polymer team. They've done fantastic work creating a workable polyfill. However some problems have persisted:
