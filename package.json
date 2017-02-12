@@ -1,19 +1,19 @@
 {
-  "name": "@webcomponents/shadydom",
-  "version": "0.0.1",
-  "description": "shadydom.js",
-  "main": "shadydom.min.js",
+  "name": "cloudydom",
+  "version": "1.0.0",
+  "description": "cloudydom is a ShadowDOM polyfill",
+  "main": "cloudydom.min.js",
   "directories": {
     "test": "tests"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/webcomponents/shadydom.git"
+    "url": "https://github.com/matthewp/cloudydom.git"
   },
-  "author": "The Polymer Authors",
+  "author": "The Polymer Authors, Matthew Phillips",
   "license": "BSD-3-Clause",
   "bugs": {
-    "url": "https://github.com/webcomponents/shadydom/issues"
+    "url": "https://github.com/matthewp/cloudydom/issues"
   },
   "scripts": {
     "test": "wct"

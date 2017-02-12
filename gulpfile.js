@@ -47,7 +47,7 @@ gulp.task('default', function() {
       language_in: 'ES6_STRICT',
       language_out: 'ES5_STRICT',
       output_wrapper: '(function(){\n%output%\n}).call(this)',
-      js_output_file: 'shadydom.min.js',
+      js_output_file: 'cloudydom.min.js',
       rewrite_polyfills: false
     }))
     .on('error', (e) => console.error(e))
@@ -65,7 +65,7 @@ gulp.task('babili', () => {
     sourceMap: true
   }))
   .pipe(babel(babiliConfig))
-  .pipe(rename('shadydom.min.js'))
+  .pipe(rename('cloudydom.min.js'))
   .pipe(sourcemaps.write('.'))
   .pipe(gulp.dest('./'))
 })
@@ -77,7 +77,7 @@ gulp.task('debug', () => {
     format: 'iife',
     moduleName: 'shadydom'
   }))
-  .pipe(rename('shadydom.min.js'))
+  .pipe(rename('cloudydom.min.js'))
   .pipe(gulp.dest('./'))
 })
 
@@ -91,7 +91,7 @@ gulp.task('es5', () => {
     sourceMap: true
   }))
   .pipe(babel(es5Config))
-  .pipe(rename('shadydom.min.js'))
+  .pipe(rename('cloudydom.min.js'))
   .pipe(sourcemaps.write('.'))
   .pipe(gulp.dest('./'))
 })
