@@ -279,7 +279,6 @@ export function addEventListener(type, fn, optionsOrCapture) {
         fn.handleEvent(e);
         return;
       }
-      return fn(e);
       return fn.call(this, e);
     }
   };
