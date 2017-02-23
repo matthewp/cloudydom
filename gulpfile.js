@@ -30,7 +30,7 @@ gulp.task('default', () => {
       language_in: 'ES6_STRICT',
       language_out: 'ES5_STRICT',
       output_wrapper: '(function(){\n%output%\n}).call(this)',
-      js_output_file: 'shadydom.min.js',
+      js_output_file: 'cloudydom.min.js',
       rewrite_polyfills: false,
       assume_function_wrapper: true
     }))
@@ -46,7 +46,7 @@ gulp.task('debug', () => {
     format: 'iife',
     moduleName: 'shadydom'
   }))
-  .pipe(rename('shadydom.min.js'))
+  .pipe(rename('cloudydom.min.js'))
   .pipe(size({showFiles: true, showTotal: false, gzip: true}))
   .pipe(gulp.dest('./'))
 })

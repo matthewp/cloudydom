@@ -1,6 +1,6 @@
 {
-  "name": "@webcomponents/shadydom",
-  "version": "0.0.1",
+  "name": "cloudydom",
+  "version": "1.0.2",
   "description": "shadydom.js",
   "main": "shadydom.min.js",
   "directories": {
