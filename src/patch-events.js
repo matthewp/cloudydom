@@ -16,8 +16,6 @@ import {addEventListener as nativeAddEventListener,
 
 // https://github.com/w3c/webcomponents/issues/513#issuecomment-224183937
 let alwaysComposed = {
-  blur: true,
-  focus: true,
   focusin: true,
   focusout: true,
   click: true,
@@ -108,25 +106,38 @@ function retarget(refNode, path) {
 
 let eventMixin = {
 
+  /**
+   * @this {Event}
+   */
   get composed() {
-    if (this.isTrusted && this.__composed === undefined) {
+    // isTrusted may not exist in this browser, so just check if isTrusted is explicitly false
+    if (this.isTrusted !== false && this.__composed === undefined) {
       this.__composed = alwaysComposed[this.type];
     }
     return this.__composed || false;
   },
 
+  /**
+   * @this {Event}
+   */
   composedPath() {
     if (!this.__composedPath) {
-      this.__composedPath = pathComposer(this.__target, this.composed);
+      this.__composedPath = pathComposer(this['__target'], this.composed);
     }
     return this.__composedPath;
   },
 
+  /**
+   * @this {Event}
+   */
   get target() {
     return retarget(this.currentTarget, this.composedPath());
   },
 
   // http://w3c.github.io/webcomponents/spec/shadow/#event-relatedtarget-retargeting
+  /**
+   * @this {Event}
+   */
   get relatedTarget() {
     if (!this.__relatedTarget) {
       return null;
@@ -137,10 +148,16 @@ let eventMixin = {
     // find the deepest node in relatedTarget composed path that is in the same root with the currentTarget
     return retarget(this.currentTarget, this.__relatedTargetComposedPath);
   },
+  /**
+   * @this {Event}
+   */
   stopPropagation() {
     Event.prototype.stopPropagation.call(this);
     this.__propagationStopped = true;
   },
+  /**
+   * @this {Event}
+   */
   stopImmediatePropagation() {
     Event.prototype.stopImmediatePropagation.call(this);
     this.__immediatePropagationStopped = true;
@@ -167,6 +184,7 @@ let nonBubblingEventsToRetarget = {
   focus: true,
   blur: true
 };
+
 
 function fireHandlers(event, node, phase) {
   let hs = node.__handlers && node.__handlers[event.type] &&
@@ -221,6 +239,9 @@ function retargetNonBubblingEvent(e) {
   }
 }
 
+/**
+ * @this {Event}
+ */
 export function addEventListener(type, fn, optionsOrCapture) {
   if (!fn) {
     return;
@@ -257,12 +278,15 @@ export function addEventListener(type, fn, optionsOrCapture) {
     fn.__eventWrappers = [];
   }
 
+  /**
+   * @this {HTMLElement}
+   */
   const wrapperFn = function(e) {
     // Support `once` option.
     if (once) {
       this.removeEventListener(type, fn, optionsOrCapture);
     }
-    if (!e.__target) {
+    if (!e['__target']) {
       patchEvent(e);
     }
     // There are two critera that should stop events from firing on this node
@@ -290,13 +314,17 @@ export function addEventListener(type, fn, optionsOrCapture) {
 
   if (nonBubblingEventsToRetarget[type]) {
     this.__handlers = this.__handlers || {};
-    this.__handlers[type] = this.__handlers[type] || {capture: [], bubble: []};
+    this.__handlers[type] = this.__handlers[type] ||
+      {'capture': [], 'bubble': []};
     this.__handlers[type][capture ? 'capture' : 'bubble'].push(wrapperFn);
   } else {
     nativeAddEventListener.call(this, type, wrapperFn, optionsOrCapture);
   }
 }
 
+/**
+ * @this {Event}
+ */
 export function removeEventListener(type, fn, optionsOrCapture) {
   if (!fn) {
     return;
@@ -346,7 +374,7 @@ export function removeEventListener(type, fn, optionsOrCapture) {
 function activateFocusEventOverrides() {
   for (let ev in nonBubblingEventsToRetarget) {
     window.addEventListener(ev, function(e) {
-      if (!e.__target) {
+      if (!e['__target']) {
         patchEvent(e);
         retargetNonBubblingEvent(e);
         e.stopImmediatePropagation();
@@ -356,7 +384,7 @@ function activateFocusEventOverrides() {
 }
 
 function patchEvent(event) {
-  event.__target = event.target;
+  event['__target'] = event.target;
   event.__relatedTarget = event.relatedTarget;
   // patch event prototype if we can
   if (utils.settings.hasDescriptors) {
