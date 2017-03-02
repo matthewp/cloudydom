@@ -100,10 +100,16 @@ let OutsideAccessors = {
   previousSibling: generateSimpleDescriptor('previousSibling'),
 
   className: {
+    /**
+     * @this {HTMLElement}
+     */
     get() {
       let className =  this.getAttribute('class');
       return this.getAttribute('class') ? className : '';
     },
+    /**
+     * @this {HTMLElement}
+     */
     set(value) {
       this.setAttribute('class', value);
     },
@@ -112,6 +118,9 @@ let OutsideAccessors = {
 
   // fragment, element, document
   nextElementSibling: {
+    /**
+     * @this {HTMLElement}
+     */
     get() {
       if (hasProperty(this, 'nextSibling')) {
         let n = this.nextSibling;
@@ -127,6 +136,9 @@ let OutsideAccessors = {
   },
 
   previousElementSibling: {
+    /**
+     * @this {HTMLElement}
+     */
     get() {
       if (hasProperty(this, 'previousSibling')) {
         let n = this.previousSibling;
@@ -146,6 +158,9 @@ let OutsideAccessors = {
 let InsideAccessors = {
 
   childNodes: {
+    /**
+     * @this {HTMLElement}
+     */
     get() {
       if (hasProperty(this, 'firstChild')) {
         if (!this.__shady.childNodes) {
@@ -167,6 +182,9 @@ let InsideAccessors = {
   lastChild: generateSimpleDescriptor('lastChild'),
 
   textContent: {
+    /**
+     * @this {HTMLElement}
+     */
     get() {
       if (hasProperty(this, 'firstChild')) {
         let tc = [];
@@ -180,6 +198,9 @@ let InsideAccessors = {
         return nativeTree.textContent(this);
       }
     },
+    /**
+     * @this {HTMLElement}
+     */
     set(text) {
       if (this.nodeType !== Node.ELEMENT_NODE) {
         // TODO(sorvell): can't do this if patch nodeValue.
@@ -196,6 +217,9 @@ let InsideAccessors = {
 
   // fragment, element, document
   firstElementChild: {
+    /**
+     * @this {HTMLElement}
+     */
     get() {
       if (hasProperty(this, 'firstChild')) {
         let n = this.firstChild;
@@ -211,6 +235,9 @@ let InsideAccessors = {
   },
 
   lastElementChild: {
+    /**
+     * @this {HTMLElement}
+     */
     get() {
       if (hasProperty(this, 'lastChild')) {
         let n = this.lastChild;
@@ -226,6 +253,9 @@ let InsideAccessors = {
   },
 
   children: {
+    /**
+     * @this {HTMLElement}
+     */
     get() {
       if (hasProperty(this, 'firstChild')) {
         return Array.prototype.filter.call(this.childNodes, function(n) {
@@ -240,16 +270,24 @@ let InsideAccessors = {
 
   // element (HTMLElement on IE11)
   innerHTML: {
+    /**
+     * @this {HTMLElement}
+     */
     get() {
-      let content = this.localName === 'template' ? this.content : this;
+      let content = this.localName === 'template' ?
+        /** @type {HTMLTemplateElement} */(this).content : this;
       if (hasProperty(this, 'firstChild')) {
         return getInnerHTML(content);
       } else {
         return nativeTree.innerHTML(content);
       }
     },
+    /**
+     * @this {HTMLElement}
+     */
     set(text) {
-      let content = this.localName === 'template' ? this.content : this;
+      let content = this.localName === 'template' ?
+        /** @type {HTMLTemplateElement} */(this).content : this;
       clearNode(content);
       if (nativeInnerHTMLDesc && nativeInnerHTMLDesc.set) {
         nativeInnerHTMLDesc.set.call(htmlContainer, text);
@@ -269,10 +307,17 @@ let InsideAccessors = {
 // Must be patched on instance on browsers that support native Shadow DOM
 // but do not have builtin accessors (old Chrome).
 export let ShadowRootAccessor = {
+
   shadowRoot: {
+    /**
+     * @this {HTMLElement}
+     */
     get() {
       return this.shadyRoot;
     },
+    /**
+     * @this {HTMLElement}
+     */
     set(value) {
       this.shadyRoot = value;
     },
@@ -286,9 +331,15 @@ export let ShadowRootAccessor = {
 export let ActiveElementAccessor = {
 
   activeElement: {
+    /**
+     * @this {HTMLElement}
+     */
     get() {
       return activeElementForNode(this);
     },
+    /**
+     * @this {HTMLElement}
+     */
     set() {},
     configurable: true
   }
@@ -297,6 +348,11 @@ export let ActiveElementAccessor = {
 
 // patch a group of descriptors on an object only if it exists or if the `force`
 // argument is true.
+/**
+ * @param {!Object} obj
+ * @param {!Object} descriptors
+ * @param {boolean=} force
+ */
 function patchAccessorGroup(obj, descriptors, force) {
   for (let p in descriptors) {
     let objDesc = Object.getOwnPropertyDescriptor(obj, p);
