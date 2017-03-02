@@ -1,6 +1,6 @@
 {
   "name": "cloudydom",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "cloudydom is a ShadowDOM polyfill",
   "main": "cloudydom.min.js",
   "directories": {
