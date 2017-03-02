@@ -101,7 +101,8 @@ let OutsideAccessors = {
 
   className: {
     get() {
-      return this.getAttribute('class');
+      let className =  this.getAttribute('class');
+      return this.getAttribute('class') ? className : '';
     },
     set(value) {
       this.setAttribute('class', value);
