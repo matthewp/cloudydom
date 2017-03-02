@@ -1,6 +1,6 @@
 {
   "name": "cloudydom",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "cloudydom is a ShadowDOM polyfill",
   "main": "cloudydom.min.js",
   "directories": {
@@ -8,12 +8,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/matthewp/cloudydom.git"
+    "url": "https://github.com/skatejs/cloudydom.git"
   },
   "author": "The Polymer Authors, Matthew Phillips",
   "license": "BSD-3-Clause",
   "bugs": {
-    "url": "https://github.com/matthewp/cloudydom/issues"
+    "url": "https://github.com/skatejs/cloudydom/issues"
   },
   "scripts": {
     "test": "wct"
