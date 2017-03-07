@@ -12,18 +12,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
 import * as utils from './utils'
 import {getInnerHTML} from './innerHTML'
-import {getProperty, hasProperty} from './logical-properties'
 import * as nativeTree from './native-tree'
-
-function generateSimpleDescriptor(prop) {
-  return {
-    get() {
-      let l = getProperty(this, prop);
-      return l !== undefined ? l : nativeTree[prop](this);
-    },
-    configurable: true
-  }
-}
 
 function clearNode(node) {
   while (node.firstChild) {
@@ -31,15 +20,17 @@ function clearNode(node) {
   }
 }
 
-const nativeInnerHTMLDesc =
+const nativeInnerHTMLDesc = /** @type {ObjectPropertyDescriptor} */(
   Object.getOwnPropertyDescriptor(Element.prototype, 'innerHTML') ||
-  Object.getOwnPropertyDescriptor(HTMLElement.prototype, 'innerHTML');
+  Object.getOwnPropertyDescriptor(HTMLElement.prototype, 'innerHTML'));
 
 const inertDoc = document.implementation.createHTMLDocument('inert');
 const htmlContainer = inertDoc.createElement('div');
 
-const nativeActiveElementDescriptor = Object.getOwnPropertyDescriptor(
-  Document.prototype, 'activeElement');
+const nativeActiveElementDescriptor =
+  /** @type {ObjectPropertyDescriptor} */(
+    Object.getOwnPropertyDescriptor(Document.prototype, 'activeElement')
+  );
 function getDocumentActiveElement() {
   if (nativeActiveElementDescriptor && nativeActiveElementDescriptor.get) {
     return nativeActiveElementDescriptor.get.call(document);
@@ -90,14 +81,42 @@ function activeElementForNode(node) {
 }
 
 let OutsideAccessors = {
-  // node...
-  parentElement: generateSimpleDescriptor('parentElement'),
 
-  parentNode: generateSimpleDescriptor('parentNode'),
+  parentElement: {
+    /** @this {Node} */
+    get() {
+      let l = this.__shady && this.__shady.parentElement;
+      return l !== undefined ? l : nativeTree.parentElement(this);
+    },
+    configurable: true
+  },
 
-  nextSibling: generateSimpleDescriptor('nextSibling'),
+  parentNode: {
+    /** @this {Node} */
+    get() {
+      let l = this.__shady && this.__shady.parentNode;
+      return l !== undefined ? l : nativeTree.parentNode(this);
+    },
+    configurable: true
+  },
 
-  previousSibling: generateSimpleDescriptor('previousSibling'),
+  nextSibling: {
+    /** @this {Node} */
+    get() {
+      let l = this.__shady && this.__shady.nextSibling;
+      return l !== undefined ? l : nativeTree.nextSibling(this);
+    },
+    configurable: true
+  },
+
+  previousSibling: {
+    /** @this {Node} */
+    get() {
+      let l = this.__shady && this.__shady.previousSibling;
+      return l !== undefined ? l : nativeTree.previousSibling(this);
+    },
+    configurable: true
+  },
 
   className: {
     /**
@@ -122,7 +141,7 @@ let OutsideAccessors = {
      * @this {HTMLElement}
      */
     get() {
-      if (hasProperty(this, 'nextSibling')) {
+      if (this.__shady && this.__shady.nextSibling !== undefined) {
         let n = this.nextSibling;
         while (n && n.nodeType !== Node.ELEMENT_NODE) {
           n = n.nextSibling;
@@ -140,7 +159,7 @@ let OutsideAccessors = {
      * @this {HTMLElement}
      */
     get() {
-      if (hasProperty(this, 'previousSibling')) {
+      if (this.__shady && this.__shady.previousSibling !== undefined) {
         let n = this.previousSibling;
         while (n && n.nodeType !== Node.ELEMENT_NODE) {
           n = n.previousSibling;
@@ -162,7 +181,7 @@ let InsideAccessors = {
      * @this {HTMLElement}
      */
     get() {
-      if (hasProperty(this, 'firstChild')) {
+      if (this.__shady && this.__shady.firstChild !== undefined) {
         if (!this.__shady.childNodes) {
           this.__shady.childNodes = [];
           for (let n=this.firstChild; n; n=n.nextSibling) {
@@ -177,16 +196,30 @@ let InsideAccessors = {
     configurable: true
   },
 
-  firstChild: generateSimpleDescriptor('firstChild'),
+  firstChild: {
+    /** @this {HTMLElement} */
+    get() {
+      let l = this.__shady && this.__shady.firstChild;
+      return l !== undefined ? l : nativeTree.firstChild(this);
+    },
+    configurable: true
+  },
 
-  lastChild: generateSimpleDescriptor('lastChild'),
+  lastChild: {
+  /** @this {HTMLElement} */
+    get() {
+      let l = this.__shady && this.__shady.lastChild;
+      return l !== undefined ? l : nativeTree.lastChild(this);
+    },
+    configurable: true
+  },
 
   textContent: {
     /**
      * @this {HTMLElement}
      */
     get() {
-      if (hasProperty(this, 'firstChild')) {
+      if (this.__shady && this.__shady.firstChild !== undefined) {
         let tc = [];
         for (let i = 0, cn = this.childNodes, c; (c = cn[i]); i++) {
           if (c.nodeType !== Node.COMMENT_NODE) {
@@ -221,7 +254,7 @@ let InsideAccessors = {
      * @this {HTMLElement}
      */
     get() {
-      if (hasProperty(this, 'firstChild')) {
+      if (this.__shady && this.__shady.firstChild !== undefined) {
         let n = this.firstChild;
         while (n && n.nodeType !== Node.ELEMENT_NODE) {
           n = n.nextSibling;
@@ -239,7 +272,7 @@ let InsideAccessors = {
      * @this {HTMLElement}
      */
     get() {
-      if (hasProperty(this, 'lastChild')) {
+      if (this.__shady && this.__shady.lastChild !== undefined) {
         let n = this.lastChild;
         while (n && n.nodeType !== Node.ELEMENT_NODE) {
           n = n.previousSibling;
@@ -257,7 +290,7 @@ let InsideAccessors = {
      * @this {HTMLElement}
      */
     get() {
-      if (hasProperty(this, 'firstChild')) {
+      if (this.__shady && this.__shady.firstChild !== undefined) {
         return Array.prototype.filter.call(this.childNodes, function(n) {
           return (n.nodeType === Node.ELEMENT_NODE);
         });
@@ -276,7 +309,7 @@ let InsideAccessors = {
     get() {
       let content = this.localName === 'template' ?
         /** @type {HTMLTemplateElement} */(this).content : this;
-      if (hasProperty(this, 'firstChild')) {
+      if (this.__shady && this.__shady.firstChild !== undefined) {
         return getInnerHTML(content);
       } else {
         return nativeTree.innerHTML(content);
@@ -313,13 +346,14 @@ export let ShadowRootAccessor = {
      * @this {HTMLElement}
      */
     get() {
-      return this.shadyRoot;
+      return this.__shady && this.__shady.root || null;
     },
     /**
      * @this {HTMLElement}
      */
     set(value) {
-      this.shadyRoot = value;
+      this.__shady = this.__shady || {};
+      this.__shady.root = value;
     },
     configurable: true
   }
