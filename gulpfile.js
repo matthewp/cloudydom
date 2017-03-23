@@ -29,7 +29,7 @@ gulp.task('default', () => {
       compilation_level: 'ADVANCED',
       language_in: 'ES6_STRICT',
       language_out: 'ES5_STRICT',
-      output_wrapper: '(function(){\n%output%\n}).call(this)',
+      output_wrapper: '(function(){\n%output%\n}).call(self);',
       assume_function_wrapper: true,
       js_output_file: 'cloudydom.min.js',
       warning_level: 'VERBOSE',
