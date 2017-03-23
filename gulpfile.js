@@ -29,9 +29,9 @@ gulp.task('default', () => {
       compilation_level: 'ADVANCED',
       language_in: 'ES6_STRICT',
       language_out: 'ES5_STRICT',
-      output_wrapper: '(function(){\n%output%\n}).call(this)',
+      output_wrapper: '(function(){\n%output%\n}).call(self);',
       assume_function_wrapper: true,
-      js_output_file: 'cloudydom.min.js',
+      js_output_file: 'shadydom.min.js',
       warning_level: 'VERBOSE',
       rewrite_polyfills: false,
       externs: 'externs/shadydom.js'
@@ -48,7 +48,7 @@ gulp.task('debug', () => {
     format: 'iife',
     moduleName: 'shadydom'
   }))
-  .pipe(rename('cloudydom.min.js'))
+  .pipe(rename('shadydom.min.js'))
   .pipe(size({showFiles: true, showTotal: false, gzip: true}))
   .pipe(gulp.dest('./'))
 })
