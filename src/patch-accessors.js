@@ -8,11 +8,9 @@ Code distributed by Google as part of the polymer project is also
 subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
 */
 
-'use strict';
-
-import * as utils from './utils'
-import {getInnerHTML} from './innerHTML'
-import * as nativeTree from './native-tree'
+import * as utils from './utils.js';
+import {getInnerHTML} from './innerHTML.js';
+import * as nativeTree from './native-tree.js';
 
 function clearNode(node) {
   while (node.firstChild) {
@@ -85,7 +83,10 @@ let OutsideAccessors = {
   parentElement: {
     /** @this {Node} */
     get() {
-      let l = this.__shady && this.__shady.parentElement;
+      let l = this.__shady && this.__shady.parentNode;
+      if (l && l.nodeType !== Node.ELEMENT_NODE) {
+        l = null;
+      }
       return l !== undefined ? l : nativeTree.parentElement(this);
     },
     configurable: true
@@ -180,6 +181,7 @@ let InsideAccessors = {
      * @this {HTMLElement}
      */
     get() {
+      let childNodes;
       if (this.__shady && this.__shady.firstChild !== undefined) {
         if (!this.__shady.childNodes) {
           this.__shady.childNodes = [];
@@ -187,10 +189,22 @@ let InsideAccessors = {
             this.__shady.childNodes.push(n);
           }
         }
-        return this.__shady.childNodes;
+        childNodes = this.__shady.childNodes;
       } else {
-        return nativeTree.childNodes(this);
+        childNodes = nativeTree.childNodes(this);
       }
+      childNodes.item = function(index) {
+        return childNodes[index];
+      }
+      return childNodes;
+    },
+    configurable: true
+  },
+
+  childElementCount: {
+    /** @this {HTMLElement} */
+    get() {
+      return this.children.length;
     },
     configurable: true
   },
@@ -241,9 +255,7 @@ let InsideAccessors = {
         }
       } else {
         clearNode(this);
-        if (text) {
-          this.appendChild(document.createTextNode(text));
-        }
+        this.appendChild(document.createTextNode(text));
       }
     },
     configurable: true
@@ -291,13 +303,18 @@ let InsideAccessors = {
      * @this {HTMLElement}
      */
     get() {
+      let children;
       if (this.__shady && this.__shady.firstChild !== undefined) {
-        return Array.prototype.filter.call(this.childNodes, function(n) {
+        children = Array.prototype.filter.call(this.childNodes, function(n) {
           return (n.nodeType === Node.ELEMENT_NODE);
         });
       } else {
-        return nativeTree.children(this);
+        children = nativeTree.children(this);
       }
+      children.item = function(index) {
+        return children[index];
+      }
+      return children;
     },
     configurable: true
   },

@@ -8,10 +8,8 @@ Code distributed by Google as part of the polymer project is also
 subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
 */
 
-'use strict';
-
-import {removeChild} from './native-methods'
-import {parentNode} from './native-tree'
+import {removeChild, dispatchEvent} from './native-methods.js';
+import {parentNode} from './native-tree.js';
 
 // NOTE: normalize event contruction where necessary (IE11)
 let NormalizedEvent = typeof Event === 'function' ? Event :
@@ -197,7 +195,7 @@ export default class {
     // NOTE: cannot bubble correctly here so not setting bubbles: true
     // Safari tech preview does not bubble but chrome does
     // Spec says it bubbles (https://dom.spec.whatwg.org/#mutation-observers)
-    insertionPoint.dispatchEvent(new NormalizedEvent('slotchange'));
+    dispatchEvent.call(insertionPoint, new NormalizedEvent('slotchange'));
     if (insertionPoint.__shady.assignedSlot) {
       this._fireSlotChange(insertionPoint.__shady.assignedSlot);
     }
