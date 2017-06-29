@@ -3,7 +3,7 @@
 ShadyDOM provides a shim for ShadowDOM V1. It is less correct but less intrusive
 and faster than the ShadowDOM Polyfill.
 
-##Usage
+## Usage
 
 Usage of the shim is transparent when `attachShadow` is unavailable. Elements are
 patched as needed to report ShadowDOM correct dom information. Only dom tree
@@ -13,18 +13,31 @@ accessors and mutation api is maintained. Some dom api
 To force ShadyDOM to be used even when native ShadowDOM is available, set
 the `ShadyDOM = {force: true}` in a script prior to loading the polyfill.
 
-##Example
+## Example
 
 ```html
 <div id="host"></div>
 <script>
-  host.attachShadow({mode: 'open');
+  host.attachShadow({mode: 'open'});
   host.shadowRoot.appendChild(document.createElement('a'));
 </script>
 
 ```
 
-##Limitations
+## Building and Testing
+
+For building and testing, first run
+```
+npm install
+bower install
+```
+
+To build, make sure gulp is installed and `gulp`.
+
+To test, run `npm test`
+
+
+## Limitations
 
 ShadyDOM distribution is asynchronous for performance reasons. This means that
 the composed dom will be available 1 microtask after the dom mutation occurs.
